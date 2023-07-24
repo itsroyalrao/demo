@@ -1,80 +1,61 @@
-var form = document.getElementById('addForm');
-var itemList = document.getElementById('items');
-var filter = document.getElementById('filter');
+const submit = document.getElementById('submit');
 
-// Form submit event
-form.addEventListener('submit', addItem);
-// Delete event
-itemList.addEventListener('click', removeItem);
-// Filter event
-filter.addEventListener('keyup', filterItems);
-
-// Add item
-function addItem(e){
+submit.addEventListener('click', function (e) {
   e.preventDefault();
 
-  // Get input value
-  var newItem = document.getElementById('item').value;
-  var newItemValue = document.getElementById('item-value').value;
+  const amount = document.getElementById('amount');
+  const desc = document.getElementById('desc');
+  const category = document.getElementById('category');
 
-  // Create new li element
-  var li = document.createElement('li');
-  // Add class
-  li.className = 'list-group-item';
-  // Add text node with input value
-  li.appendChild(document.createTextNode(newItem + ' '));
-  li.appendChild(document.createTextNode(newItemValue));
+  var obj = {
+    amnt: amount.value,
+    dsc: desc.value,
+    ctg: category.value
+  }
 
-  // Create del button element
-  var deleteBtn = document.createElement('button');
+  localStorage.setItem(JSON.stringify(obj), JSON.stringify(obj));
 
-  // Add classes to del button
-  deleteBtn.className = 'btn btn-danger btn-sm float-right delete';
+  // Add the item to the list when submitted
+  addItemToList(obj);
 
-  // Append text node
-  deleteBtn.appendChild(document.createTextNode('X'));
+  // Clear the input fields after submission
+  amount.value = '';
+  desc.value = '';
+});
 
-  // Append button to li
-  li.appendChild(deleteBtn);
-
-  // EDIT button
-  var editBtn = document.createElement('button');
-  editBtn.className = 'btn btn-sm float-right';
-  editBtn.appendChild(document.createTextNode('EDIT'));
-  li.appendChild(editBtn);
-
-  // Append li to list
-  itemList.appendChild(li);
-}
-
-// Remove item
-function removeItem(e){
-  if(e.target.classList.contains('delete')){
-    if(confirm('Are You Sure?')){
-      var li = e.target.parentElement;
-      itemList.removeChild(li);
-    }
+// Function to load existing items from localStorage
+function loadItems() {
+  for (let i = 0; i < localStorage.length; i++) {
+    let key = localStorage.key(i);
+    let strRes = localStorage.getItem(key);
+    let newres = JSON.parse(strRes);
+    addItemToList(newres);
   }
 }
 
-// Filter Items
-function filterItems(e){
-  // convert text to lowercase
-  var text = e.target.value.toLowerCase();
-  // Get list
-  var items = itemList.getElementsByTagName('li');
-  // Convert to an array
-  Array.from(items).forEach(function(item){
-    var itemName = item.firstChild.textContent;
-    var itemValue = item.firstChild.nextSibling.textContent;
-    if(itemName.toLowerCase().indexOf(text) != -1){
-      item.style.display = 'block';
-    }
-    else if (itemValue.toLowerCase().indexOf(text) != -1) {
-      item.style.display = 'block';
-    }
-    else {
-      item.style.display = 'none';
-    }
+// Function to add a single item to the list
+function addItemToList(item) {
+  const ul = document.getElementById('display-items');
+  const li = document.createElement('li');
+  li.textContent = item.amnt + '-' + item.ctg + '-' + item.dsc + ' ';
+  ul.appendChild(li);
+
+  const dlt = document.createElement('button');
+  dlt.textContent = 'DELETE EXPENSE';
+  li.appendChild(dlt);
+  
+  const edit = document.createElement('button');
+  edit.textContent = 'EDIT EXPENSE';
+  li.appendChild(edit);
+
+  dlt.addEventListener('click', function (event) {
+    event.preventDefault();
+    localStorage.removeItem(JSON.stringify(item));
+    ul.removeChild(li);
   });
 }
+
+// Call the loadItems function when the page loads
+window.addEventListener('load', function () {
+  loadItems();
+});
