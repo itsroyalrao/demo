@@ -4,7 +4,8 @@
   "description": "Sign Up page",
   "main": "app.js",
   "scripts": {
-    "start": "nodemon app.js"
+    "start": "node app.js",
+    "s": "nodemon app.js"
   },
   "keywords": [],
   "author": "Mohit",
